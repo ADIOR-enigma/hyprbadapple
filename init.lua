@@ -59,7 +59,7 @@ local notify; do
 
 	--- @diagnostic disable-next-line: unused-function, unused-local
 	notify = function(...)
-		if (not dump) then dump = require("utils.dump"); end;
+		if (not dump) then dump = require("utils.table._dump"); end;
 		-- debug
 		local str = { ..., };
 		for i = 1, #str do
@@ -280,7 +280,9 @@ local pool_selector = {}; do
 				listener:remove(); listener = nil;
 			end;
 			clean_stray();
-			return spawner:set_enabled(false);
+			spawner:set_enabled(false);
+			spawner = nil;
+			return;
 		end;
 
 		_tag_arg.tag = "+bad_apple";
@@ -322,7 +324,9 @@ local loader; loader = cycle(function()
 		box_file:close();
 		print("bad_apple PROG: loaded " .. frames_len .. " frames");
 
-		return loader:set_enabled(false);
+		loader:set_enabled(false);
+		loader = nil;
+		return;
 	end;
 
 	for i = 1, bulk_len, READ_BYTES do
@@ -360,10 +364,11 @@ end);
 
 local watcher; watcher = cycle(function()
 	-- starts when `loader` finishes caching frames
+	if ((loader and loader:is_enabled()) or pool_len < MAX_BOXES) then return; end;
 	-- and all the windows are opened
-	if (loader:is_enabled() or pool_len < MAX_BOXES) then return; end;
 
 	watcher:set_enabled(false);
+	watcher = nil;
 
 	dispatch(window_close({ window = "title:bad_progress", }));
 	print("bad_apple: starting");
@@ -374,13 +379,13 @@ local watcher; watcher = cycle(function()
 
 	execute("mpv --pause --input-ipc-server=/tmp/mpvsocket " .. AUDIO_PATH .. " &");
 	defer(function()
-		local prev = {};
 		local frame_index = 1;
 		local start_time = now();
 		-- syncing
 		execute(
 			[[echo 'set pause no' | socat - /tmp/mpvsocket]]
 		);
+		-- notify(frames);
 
 		cycle(function()
 			local elapsed = now() - start_time;
@@ -427,22 +432,27 @@ local watcher; watcher = cycle(function()
 
 						is_hidden[i] = false;
 					end;
-
-					prev[i] = box;
 				end;
 			end;
 
 			for i = boxes_len + 1, MAX_BOXES do
-				if (prev[i]) then
-					hide(i); prev[i] = nil;
+				if (prev_x[i] ~= nil) then
+					hide(i);
 				end;
 			end;
+			frames[frame_index] = nil;
 			frame_index = frame_index + 1;
 
 			if (frame_index > frames_len) then
 				abort_signal = true;
+
+				frames = nil;
+				frame  = nil;
+				collectgarbage("collect");
 				-- finished
 			end;
 		end, (1000 / FPS));
 	end, 500);
 end, 100);
+
+collectgarbage("collect");
