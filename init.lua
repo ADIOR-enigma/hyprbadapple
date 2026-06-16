@@ -227,7 +227,7 @@ do
 		animation(_arg);
 	end;
 end;
-
+--
 -- reduce garbage janitor works (not allocating every frame)
 local _transform_arg = { x = 0, y = 0, };
 local _tag_arg       = {};
@@ -364,8 +364,8 @@ end);
 
 local watcher; watcher = cycle(function()
 	-- starts when `loader` finishes caching frames
-	if ((loader and loader:is_enabled()) or pool_len < MAX_BOXES) then return; end;
 	-- and all the windows are opened
+	if ((loader and loader:is_enabled()) or pool_len < MAX_BOXES) then return; end;
 
 	watcher:set_enabled(false);
 	watcher = nil;
