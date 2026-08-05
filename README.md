@@ -1,12 +1,16 @@
 
 # Video
-[![uwu](https://img.youtube.com/vi/_U7K9CbeSq8/0.jpg)](https://www.youtube.com/watch?v=_U7K9CbeSq8)
+
+
+https://github.com/user-attachments/assets/b327ddbc-1fc1-4904-92cb-2233c8a5a894
+
+
 
 # Getting started
 Clone this repo
 ```sh
 # ~/
-git clone https://github.com/hxero/hyprbadapple
+git clone https://github.com/ADIOR-enigma/hyprbadapple
 cd hyprbadapple
 ```
 
