@@ -19,7 +19,7 @@ local defer, cycle; do
 		local self; self = timer(function()
 			if (abort_signal) then
 				self:set_enabled(false);
-				abort();
+				if (abort) then abort() end;
 
 				collectgarbage("collect");
 				return;
@@ -123,6 +123,7 @@ local function validate_file(path)
 	return os.rename(correct_path, correct_path);
 end;
 
+package.loaded["config"] = nil;
 local config = require("config");
 local LAUNCH, BOX_PATH, AUDIO_PATH, MAX_BOXES, SCALE, FPS, OFFSET_X, OFFSET_Y =
 	config.LAUNCH, config.BOX_PATH, config.AUDIO_PATH,
@@ -160,38 +161,39 @@ local box_file = assert(io.open(BOX_PATH, "rb"));
 local now = require("meti"); -- > fn(void): time
 --          just a copy of luasocket .gettime
 
+local function cleanup_all()
+	abort_signal = true;
+	local _arg   = {};
+
+	local debounce;
+	local killer; killer = hl.timer(function()
+		-- because some windows get launched later and not get included
+		local windows = get_windows({ tag = "bad_apple*", });
+
+		if (#windows == 0) then
+			if (not debounce) then
+				debounce = true;
+				execute("sleep 0.1 ; hyprctl reload && pkill mpv");
+			end;
+			killer:set_enabled(false);
+			return;
+		end;
+
+		local target = windows[1];
+		if (target) then
+			_arg.window = target;
+			dispatch(window_dsp.kill(_arg));
+		end;
+	end, { timeout = 4, type = "repeat", });
+end
+
 -- init
 -- killswitch for debugging
 defer(function()
 	-- defered because, i had SUPER + U to execute from main config
 	-- and it would interfere somehow
 	hl.unbind("SUPER + U");
-	hl.bind("SUPER + U", function()
-		-- replace box with the process name, e.g. kitty
-		abort_signal = true;
-		local _arg   = {};
-
-		local debounce;
-		local killer; killer = hl.timer(function()
-			-- because some windows get launched later and not get included
-			local windows = get_windows({ tag = "bad_apple*", });
-
-			if (#windows == 0) then
-				if (not debounce) then
-					debounce = true;
-					execute("sleep 0.1 ; hyprctl reload && pkill mpv");
-				end;
-				killer:set_enabled(false);
-				return;
-			end;
-
-			local target = windows[1];
-			if (target) then
-				_arg.window = target;
-				dispatch(window_dsp.kill(_arg));
-			end;
-		end, { timeout = 4, type = "repeat", });
-	end);
+	hl.bind("SUPER + U", cleanup_all);
 end);
 -- ]]
 
@@ -269,7 +271,7 @@ local pool_selector = {}; do
 	end;
 
 	local listener; listener = on_event("window.open", function(window)
-		if (t_find(window.tags, "bad_apple*")) then resume = true; end;
+		if (t_find(window.tags, "bad_apple*") or t_find(window.tags, "bad_apple")) then resume = true; end;
 	end);
 
 	-- this instead of for loop to try and avoid crashes from batch launching
@@ -377,7 +379,7 @@ local watcher; watcher = cycle(function()
 		hide(i);
 	end;
 
-	execute("mpv --pause --input-ipc-server=/tmp/mpvsocket " .. AUDIO_PATH .. " &");
+	execute("rm -f /tmp/mpvsocket ; mpv --no-resume-playback --pause --input-ipc-server=/tmp/mpvsocket " .. AUDIO_PATH .. " &");
 	defer(function()
 		local frame_index = 1;
 		local start_time = now();
@@ -444,7 +446,7 @@ local watcher; watcher = cycle(function()
 			frame_index = frame_index + 1;
 
 			if (frame_index > frames_len) then
-				abort_signal = true;
+				cleanup_all()
 
 				frames = nil;
 				frame  = nil;

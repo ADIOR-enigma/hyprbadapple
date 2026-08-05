@@ -11,7 +11,7 @@ import numpy as np
 from multiprocessing import Pool, cpu_count
 
 INPUT = "badapple.webm"
-MAX_WIDTH = 64
+MAX_WIDTH = 128
 THRESHOLD = 255 * 0.4  # lum
 
 BOXES_JSON = "boxes.json"
