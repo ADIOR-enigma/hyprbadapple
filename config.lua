@@ -5,7 +5,7 @@ return {
 	BOX_PATH   = "baprocess/output/boxes.bin", -- path to the generated bin file
 	AUDIO_PATH = "baprocess/badapple.mp3",
 
-	MAX_BOXES = 200, -- the `most boxes` from python
+	MAX_BOXES = 500, -- the `most boxes` from python
 	FPS       = 30, -- 1-30 framerate (sync playback)
 
 	SCALE    = 10, -- scale  -> resolution height / (grid height)
