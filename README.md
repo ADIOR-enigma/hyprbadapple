@@ -9,7 +9,6 @@ https://github.com/user-attachments/assets/b327ddbc-1fc1-4904-92cb-2233c8a5a894
 # Getting started
 Clone this repo
 ```sh
-# ~/
 git clone https://github.com/ADIOR-enigma/hyprbadapple
 cd hyprbadapple
 ```
@@ -22,20 +21,25 @@ cd hyprbadapple
  \
 Arch-based
 ```sh
-sudo pacman -S mpv socat
+sudo pacman -S mpv socat --needed
 ```
 
 Other distros
 > idk, figure it out
 
+## Build
+You will need to compile the provided C source files before running. A build script is included for convenience. Make sure you have `gcc`, `wayland-scanner` and `pkg-config` installed.
+```sh
+./build.sh
+```
+
+
 ## Configuring
 See useful stats for configuration
 ```sh
-# ~/hyprbadapple
 cd baprocess
 
-# ~/hyprbadapple/baprocess
-pip install -r requirements.txt
+sudo pacman -S python-opencv python-numpy python-pillow python-tqdm --needed
 python pack.py
 
 # skipping video decode...
@@ -45,6 +49,29 @@ python pack.py
 # grid size    : 64x48
 # wrote output/boxes.bin
 ```
+
+## Start
+> [!IMPORTANT]
+> To force stop cleanly, press `SUPER + U` after you started
+
+Follow these steps to start the animation:
+
+1. Move back to the main `hyprbadapple` directory (since you were in `baprocess`).
+2. Run the `start.sh` script to launch the animation.
+3. The terminal will close automatically.
+
+Easy copy-paste command:
+```sh
+cd ..
+sh start.sh && exit
+```
+
+Or, if you prefer to launch directly without the `start.sh` script:
+```sh
+cd ..
+hyprctl eval "dofile'$PWD/init.lua'" && exit
+```
+> `&& exit` is used to exit the terminal after starting
 
 ### Constants
 You can edit some constants based on these values and your monitor resolution \
@@ -78,23 +105,9 @@ and, `OFFSET_X` = `(1920 - 64*25)/2` = `160`
  \
 Change this to launch different window e.g. `kitty` `foot`
 ```lua
-LAUNCH = "~/hyprbadapple/box", -- window launch command
+LAUNCH = "./box", -- window launch command
 -- local LAUNCH = "kitty";
 -- local LAUNCH = "firefox";
 ```
  > It's not recommended to launch heavy window like a browser
  > or something similar as it may crash
-
-## Start
-> [!IMPORTANT]
-> To force stop cleanly, press `SUPER + U` after you started
-
-cd into `hyprbadapple`, then run
-```sh
-sh start.sh&&exit
-```
-or directly
-```sh
-hyprctl eval "dofile'$PWD/init.lua'"&&exit
-```
-> `&&exit` to exit the terminal after starting

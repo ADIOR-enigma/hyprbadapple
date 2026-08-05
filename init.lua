@@ -152,6 +152,10 @@ assert(type(OFFSET_Y) == "number", "OFFSET_Y must be a valid integer");
 MAX_BOXES, FPS, SCALE, OFFSET_X, OFFSET_Y =
 	floor(MAX_BOXES), floor(FPS), floor(SCALE), floor(OFFSET_X), floor(OFFSET_Y);
 
+if LAUNCH:sub(1, 2) == "./" then
+	LAUNCH = current_dir .. LAUNCH:sub(3)
+end
+
 BOX_PATH, AUDIO_PATH =
 	relative_path(BOX_PATH), relative_path(AUDIO_PATH);
 

@@ -1,0 +1,13 @@
+# compiled binaries
+box
+meti.so
+
+# wayland protocols generated
+xdg-shell-protocol.c
+xdg-shell-client-protocol.h
+
+# python environment
+.venv
+__pycache__
+baprocess/output
+baprocess/__pycache__

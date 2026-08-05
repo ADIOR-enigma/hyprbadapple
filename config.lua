@@ -1,5 +1,5 @@
 return {
-	LAUNCH = "~/hyprbadapple/box", -- window launch command
+	LAUNCH = "./box", -- window launch command
 
 	-- relative path to current dir
 	BOX_PATH   = "baprocess/output/boxes.bin", -- path to the generated bin file
