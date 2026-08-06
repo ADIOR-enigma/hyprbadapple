@@ -2,8 +2,7 @@
 # Video
 
 
-https://github.com/user-attachments/assets/b327ddbc-1fc1-4904-92cb-2233c8a5a894
-
+https://github.com/user-attachments/assets/6052246b-74b3-4055-ab4a-ae847e5f6169
 
 
 # Getting started
